@@ -14,7 +14,13 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@db": ["./src/db/index.ts"],
+      "@types": ["./src/types.ts"],
+      "@const": ["./src/const/index.ts"],
+      "@utils": ["./src/utils/index.ts"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

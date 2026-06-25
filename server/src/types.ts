@@ -39,7 +39,7 @@ export interface User {
 
 export interface WSMessage {
   type: string;
-  data: any;
+  data: unknown;
   id: number;
 }
 
