@@ -16,10 +16,12 @@
     "sourceMap": true,
     "types": ["node"],
     "paths": {
-      "@db": ["./src/db/index.ts"],
+      "@store": ["./src/store/index.ts"],
       "@types": ["./src/types.ts"],
       "@const": ["./src/const/index.ts"],
-      "@utils": ["./src/utils/index.ts"]
+      "@utils": ["./src/utils/index.ts"],
+      "@services": ["./src/services/index.ts"],
+      "@validators": ["./src/validators/index.ts"]
     }
   },
   "include": ["src/**/*"],
