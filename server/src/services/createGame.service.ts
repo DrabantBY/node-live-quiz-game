@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 import { MESSAGE_TYPE } from '@const';
-import { games, websockets } from '@store';
+import { codesMap, gamesMap, gameWsMap, socketsMap } from '@store';
 import type { Game, WSMessage } from '@types';
 import { sendWsError, sendWsMessage } from '@utils';
 import { createGameValidator } from '@validators';
@@ -12,7 +12,7 @@ export const createGameService = (ws: WebSocket, { data }: WSMessage): void => {
     return;
   }
 
-  const userId = websockets.get(ws);
+  const userId = socketsMap.get(ws);
 
   if (!userId) {
     sendWsError(ws, 'User not found');
@@ -30,7 +30,9 @@ export const createGameService = (ws: WebSocket, { data }: WSMessage): void => {
     playerAnswers: new Map(),
   };
 
-  games.set(game.code, game);
+  gamesMap.set(game.id, game);
+  codesMap.set(game.code, game);
+  gameWsMap.set(game.id, ws);
 
   sendWsMessage(ws, MESSAGE_TYPE.GAME_CREATED, {
     gameId: game.id,

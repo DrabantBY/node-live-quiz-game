@@ -1,3 +1,3 @@
-import type { User } from "@types"
+import type { User } from '@types';
 
-export const users = new Map<string, User>()
+export const usersMap = new Map<string, User>();

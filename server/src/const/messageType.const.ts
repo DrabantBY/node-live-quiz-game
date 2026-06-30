@@ -5,4 +5,7 @@ export const MESSAGE_TYPE = {
   JOIN_GAME: 'join_game',
   GAME_JOINED: 'game_joined',
   PLAYER_JOINED: 'player_joined',
+  UPDATE_PLAYER: 'update_players',
+  START_GAME: 'start_game',
+  QUESTION: 'question',
 } as const;

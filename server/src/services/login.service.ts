@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { users, websockets } from '@store';
+import { socketsMap, usersMap } from '@store';
 import type { WSMessage } from '@types';
 import { sendWsMessage, sendWsRegError } from '@utils';
 import { regDataValidator } from '@validators';
@@ -19,7 +19,7 @@ export const loginService = (
   let isUserExists: boolean = false;
   let userIndex: string | null = null;
 
-  for (const user of users.values()) {
+  for (const user of usersMap.values()) {
     if (user.name === name) {
       isUserExists = !isUserExists;
       userIndex = user.index;
@@ -29,20 +29,20 @@ export const loginService = (
 
   if (!isUserExists) {
     const index = randomUUID();
-    users.set(index, { index, name, password });
-    websockets.set(ws, index);
+    usersMap.set(index, { index, name, password });
+    socketsMap.set(ws, index);
     sendWsMessage(ws, type, { name, index, error: false, errorText: '' });
     return;
   }
 
-  const user = users.get(userIndex ?? '');
+  const user = usersMap.get(userIndex ?? '');
 
   if (user?.password !== password) {
     sendWsRegError(ws, name, 'Invalid password. Try again.');
     return;
   }
 
-  websockets.set(ws, user.index);
+  socketsMap.set(ws, user.index);
 
   sendWsMessage(ws, type, {
     name: user.name,
