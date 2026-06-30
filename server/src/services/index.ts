@@ -1,2 +1,3 @@
-export * from './game.service'
-export * from "./login.service";
+export * from './createGame.service';
+export * from './joinGame.service';
+export * from './login.service';

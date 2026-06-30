@@ -1,1 +1,1 @@
-export * from './rawDataType.const';
+export * from './messageType.const';

@@ -1,25 +1,28 @@
 import { randomBytes, randomUUID } from 'node:crypto';
-import { games } from '@store';
+import { MESSAGE_TYPE } from '@const';
+import { games, websockets } from '@store';
 import type { Game, WSMessage } from '@types';
-import { sendWsMessage } from '@utils';
+import { sendWsError, sendWsMessage } from '@utils';
 import { createGameValidator } from '@validators';
 import type { WebSocket } from 'ws';
 
-export const gameService = (ws: WebSocket, { data, id }: WSMessage): void => {
+export const createGameService = (ws: WebSocket, { data }: WSMessage): void => {
   if (!createGameValidator(data)) {
-    sendWsMessage(ws, {
-      type: 'error',
-      data: { message: 'Invalid create game data' },
-      id,
-    });
+    sendWsError(ws, 'Invalid create game data');
+    return;
+  }
 
+  const userId = websockets.get(ws);
+
+  if (!userId) {
+    sendWsError(ws, 'User not found');
     return;
   }
 
   const game: Game = {
     id: randomUUID(),
     code: randomBytes(3).toString('hex').toUpperCase(),
-    hostId: '',
+    hostId: userId,
     questions: data.questions,
     players: [],
     currentQuestion: 0,
@@ -29,9 +32,8 @@ export const gameService = (ws: WebSocket, { data, id }: WSMessage): void => {
 
   games.set(game.code, game);
 
-  sendWsMessage(ws, {
-    type: 'game_created',
-    data: { gameId: game.id, code: game.code },
-    id,
+  sendWsMessage(ws, MESSAGE_TYPE.GAME_CREATED, {
+    gameId: game.id,
+    code: game.code,
   });
 };
