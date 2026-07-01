@@ -1,9 +1,10 @@
 export const MESSAGE_TYPE = {
-  REG_USER: 'reg',
   CREATE_GAME: 'create_game',
   GAME_CREATED: 'game_created',
-  JOIN_GAME: 'join_game',
   GAME_JOINED: 'game_joined',
+  GAME_FINISHED: 'game_finished',
+  REG_USER: 'reg',
+  JOIN_GAME: 'join_game',
   PLAYER_JOINED: 'player_joined',
   UPDATE_PLAYER: 'update_players',
   START_GAME: 'start_game',

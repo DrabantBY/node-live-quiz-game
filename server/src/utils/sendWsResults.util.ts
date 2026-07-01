@@ -1,6 +1,6 @@
-import { MESSAGE_TYPE } from '@const';
+import { GAME_STATUS, MESSAGE_TYPE, RESULT_TIME } from '@const';
 import type { Game } from '@types';
-import { sendWsMessage } from '@utils';
+import { sendWsMessage, sendWsQuestions } from '@utils';
 import type { WebSocket } from 'ws';
 
 interface WsResultParams {
@@ -51,4 +51,33 @@ export const sendWsResults = (
       playerResults,
     });
   }
+
+  if (questionIndex === game.questions.length - 1) {
+    game.status = GAME_STATUS.FINISHED;
+
+    setTimeout(() => {
+      const scoreboard = game.players.map(({ name, score }) => ({
+        name,
+        score,
+      }));
+
+      for (const websocket of websockets) {
+        sendWsMessage(websocket, MESSAGE_TYPE.GAME_FINISHED, { scoreboard });
+      }
+    }, RESULT_TIME);
+
+    return;
+  }
+
+  for (const player of game.players) {
+    player.hasAnswered = false;
+    player.answeredCorrectly = false;
+    player.pointsEarned = 0;
+  }
+
+  game.currentQuestion += 1;
+
+  setTimeout(() => {
+    sendWsQuestions(hostWs, game);
+  }, RESULT_TIME);
 };

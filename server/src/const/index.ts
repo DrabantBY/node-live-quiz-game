@@ -1,3 +1,4 @@
 export * from './basePoints.const';
 export * from './gameStatus.const';
 export * from './messageType.const';
+export * from './resultTime.const';
