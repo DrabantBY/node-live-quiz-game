@@ -1,36 +1,24 @@
-import { MESSAGE_TYPE } from '@const';
-import { gamesMap, gameWsMap } from '@store';
+import { GAME_STATUS } from '@const';
+import { gamesMap } from '@store';
 import type { WSMessage } from '@types';
-import { getQuestionData, sendWsError, sendWsMessage } from '@utils';
+import { sendWsError, sendWsQuestions } from '@utils';
 import { startGameDataValidator } from '@validators';
 import type { WebSocket } from 'ws';
 
-export const startGameService = (ws: WebSocket, { data }: WSMessage) => {
+export const startGameService = (hostWs: WebSocket, { data }: WSMessage) => {
   if (!startGameDataValidator(data)) {
-    sendWsError(ws, 'Invalid gameId');
+    sendWsError(hostWs, 'Invalid gameId');
     return;
   }
 
   const game = gamesMap.get(data.gameId);
-  const gameWs = gameWsMap.get(data.gameId);
 
   if (!game) {
-    sendWsError(ws, 'Game not found');
+    sendWsError(hostWs, 'Game not found');
     return;
   }
 
-  if (!gameWs) {
-    sendWsError(ws, 'Websocket not found');
-    return;
-  }
+  game.status = GAME_STATUS.PROGRESS;
 
-  const questionData = getQuestionData(game);
-
-  sendWsMessage(gameWs, MESSAGE_TYPE.QUESTION, questionData);
-
-  for (const { ws } of game.players) {
-    if (ws) {
-      sendWsMessage(ws, MESSAGE_TYPE.QUESTION, questionData);
-    }
-  }
+  sendWsQuestions(hostWs, game);
 };

@@ -8,4 +8,7 @@ export const MESSAGE_TYPE = {
   UPDATE_PLAYER: 'update_players',
   START_GAME: 'start_game',
   QUESTION: 'question',
+  ANSWER: 'answer',
+  ANSWER_ACCEPT: 'answer_accepted',
+  RESULT: 'question_result',
 } as const;

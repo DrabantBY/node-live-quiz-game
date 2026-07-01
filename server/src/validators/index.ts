@@ -1,3 +1,4 @@
+export * from './answerData.validator';
 export * from './createGameData.validator';
 export * from './joinGameData.validator';
 export * from './object.validator';

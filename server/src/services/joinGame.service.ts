@@ -1,11 +1,11 @@
-import { MESSAGE_TYPE } from '@const';
+import { GAME_STATUS, MESSAGE_TYPE } from '@const';
 import { codesMap, gameWsMap, socketsMap, usersMap } from '@store';
 import type { Player, WSMessage } from '@types';
 import { sendWsError, sendWsMessage } from '@utils';
 import { joinGameDataValidator } from '@validators';
 import type { WebSocket } from 'ws';
 
-interface SendMap {
+interface WsJoinParams {
   sockets: WebSocket[];
   players: Player[];
 }
@@ -16,6 +16,13 @@ export const joinGameService = (ws: WebSocket, { data }: WSMessage): void => {
     return;
   }
 
+  const user = usersMap.get(socketsMap.get(ws) ?? '');
+
+  if (!user) {
+    sendWsError(ws, 'User not found');
+    return;
+  }
+
   const game = codesMap.get(data.code);
 
   if (!game) {
@@ -23,17 +30,8 @@ export const joinGameService = (ws: WebSocket, { data }: WSMessage): void => {
     return;
   }
 
-  const gameWs = gameWsMap.get(game.id);
-
-  if (!gameWs) {
-    sendWsError(ws, 'Websocket not found');
-    return;
-  }
-
-  const user = usersMap.get(socketsMap.get(ws) ?? '');
-
-  if (!user) {
-    sendWsError(ws, 'User not found');
+  if (game.status !== GAME_STATUS.WAITING) {
+    sendWsError(ws, 'Game has already started');
     return;
   }
 
@@ -47,33 +45,43 @@ export const joinGameService = (ws: WebSocket, { data }: WSMessage): void => {
     return;
   }
 
+  const hostWs = gameWsMap.get(game.id);
+
+  if (!hostWs) {
+    sendWsError(ws, 'Host connection not found');
+    return;
+  }
+
   game.players.push({
     name: user.name,
     index: user.index,
     score: 0,
+    pointsEarned: 0,
     ws,
   });
 
-  const sendMap = game.players.reduce<SendMap>(
+  const { sockets, players } = game.players.reduce<WsJoinParams>(
     (acc, { ws, ...player }) => {
-      acc.sockets.push(ws as WebSocket);
-      acc.players.push(player as Player);
+      if (ws) {
+        acc.sockets.push(ws);
+      }
+      acc.players.push(player);
       return acc;
     },
     {
-      sockets: [gameWs],
+      sockets: [hostWs],
       players: [],
     },
   );
 
   sendWsMessage(ws, MESSAGE_TYPE.GAME_JOINED, { gameId: game.id });
 
-  for (const socket of sendMap.sockets) {
+  for (const socket of sockets) {
     sendWsMessage(socket, MESSAGE_TYPE.PLAYER_JOINED, {
       playerName: user.name,
-      playerCount: sendMap.players.length,
+      playerCount: players.length,
     });
 
-    sendWsMessage(socket, MESSAGE_TYPE.UPDATE_PLAYER, sendMap.players);
+    sendWsMessage(socket, MESSAGE_TYPE.UPDATE_PLAYER, players);
   }
 };

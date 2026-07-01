@@ -1,4 +1,7 @@
+import type { GAME_STATUS } from '@const';
 import type { WebSocket } from 'ws';
+
+export type GameStatus = (typeof GAME_STATUS)[keyof typeof GAME_STATUS];
 
 export interface Player {
   name: string;
@@ -8,6 +11,7 @@ export interface Player {
   hasAnswered?: boolean;
   answerTime?: number;
   answeredCorrectly?: boolean;
+  pointsEarned: number;
 }
 
 export interface Question {
@@ -24,10 +28,9 @@ export interface Game {
   questions: Question[];
   players: Player[];
   currentQuestion: number;
-  status: 'waiting' | 'in_progress' | 'finished';
-  questionStartTime?: number;
-  questionTimer?: NodeJS.Timeout;
-  playerAnswers: Map<string, { answerIndex: number; timestamp: number }>;
+  status: GameStatus;
+  questionStartTime: number;
+  questionTimer: NodeJS.Timeout | null;
 }
 
 export interface User {

@@ -1,5 +1,5 @@
 import { randomBytes, randomUUID } from 'node:crypto';
-import { MESSAGE_TYPE } from '@const';
+import { GAME_STATUS, MESSAGE_TYPE } from '@const';
 import { codesMap, gamesMap, gameWsMap, socketsMap } from '@store';
 import type { Game, WSMessage } from '@types';
 import { sendWsError, sendWsMessage } from '@utils';
@@ -26,8 +26,9 @@ export const createGameService = (ws: WebSocket, { data }: WSMessage): void => {
     questions: data.questions,
     players: [],
     currentQuestion: 0,
-    status: 'waiting',
-    playerAnswers: new Map(),
+    status: GAME_STATUS.WAITING,
+    questionStartTime: 0,
+    questionTimer: null,
   };
 
   gamesMap.set(game.id, game);

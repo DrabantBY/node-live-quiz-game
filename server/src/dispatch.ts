@@ -1,5 +1,6 @@
 import { MESSAGE_TYPE } from '@const';
 import {
+  checkAnswerService,
   createGameService,
   joinGameService,
   loginService,
@@ -27,6 +28,10 @@ export const dispatch = (ws: WebSocket) => {
 
       case MESSAGE_TYPE.START_GAME:
         startGameService(ws, message);
+        break;
+
+      case MESSAGE_TYPE.ANSWER:
+        checkAnswerService(ws, message);
         break;
     }
   });
