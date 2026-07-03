@@ -1,5 +1,5 @@
 import { GAME_STATUS } from '@const';
-import { gamesMap } from '@store';
+import { gameMap } from '@store';
 import type { WSMessage } from '@types';
 import { sendWsError, sendWsQuestions } from '@utils';
 import { startGameDataValidator } from '@validators';
@@ -11,7 +11,7 @@ export const startGameService = (hostWs: WebSocket, { data }: WSMessage) => {
     return;
   }
 
-  const game = gamesMap.get(data.gameId);
+  const game = gameMap.get(data.gameId);
 
   if (!game) {
     sendWsError(hostWs, 'Game not found');

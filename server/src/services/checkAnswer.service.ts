@@ -1,5 +1,5 @@
 import { BASE_POINTS, GAME_STATUS, MESSAGE_TYPE } from '@const';
-import { gamesMap, gameWsMap } from '@store';
+import { gameMap, hostMap } from '@store';
 import type { WSMessage } from '@types';
 import { sendWsError, sendWsMessage, sendWsResults } from '@utils';
 import { answerDataValidator } from '@validators';
@@ -15,7 +15,7 @@ export const checkAnswerService = (
   }
   const { gameId, questionIndex, answerIndex } = data;
 
-  const game = gamesMap.get(gameId);
+  const game = gameMap.get(gameId);
 
   if (!game) {
     sendWsError(ws, 'Game not found');
@@ -53,10 +53,10 @@ export const checkAnswerService = (
       game.questionTimer = null;
     }
 
-    const hostWs = gameWsMap.get(gameId);
+    const hostWs = hostMap.get(game.hostId);
 
     if (!hostWs) {
-      sendWsError(ws, 'Host connection not found');
+      sendWsError(ws, 'Host connection not found. Start new game.');
       return;
     }
 

@@ -1,12 +1,18 @@
 import type { Game, User } from '@types';
 import type { WebSocket } from 'ws';
 
-export const usersMap = new Map<string, User>();
+export const userMap = new Map<string, User>();
 
-export const socketsMap = new WeakMap<WebSocket, string>();
+export const loginMap = new Map<string, string>();
 
-export const gamesMap = new Map<string, Game>();
+export const websocketMap = new WeakMap<WebSocket, string>();
 
-export const codesMap = new Map<string, Game>();
+export const connectionMap = new Map<string, WebSocket>();
 
-export const gameWsMap = new Map<string, WebSocket>();
+export const gameMap = new Map<string, Game>();
+
+export const playerMap = new Map<string, string>();
+
+export const codeMap = new Map<string, string>();
+
+export const hostMap = new Map<string, WebSocket>();

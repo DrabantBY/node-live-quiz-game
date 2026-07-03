@@ -58,10 +58,10 @@ export const sendWsResults = (
     setTimeout(() => {
       const scoreboard = game.players
         .sort((a, b) => b.score - a.score)
-        .map(({ name, score }, rank) => ({
+        .map(({ name, score }, i) => ({
           name,
           score,
-          rank: rank + 1,
+          rank: i + 1,
         }));
 
       for (const websocket of websockets) {

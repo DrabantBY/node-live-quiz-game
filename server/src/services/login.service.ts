@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { socketsMap, usersMap } from '@store';
+import { connectionMap, loginMap, userMap, websocketMap } from '@store';
 import type { WSMessage } from '@types';
 import { sendWsMessage, sendWsRegError } from '@utils';
 import { regDataValidator } from '@validators';
@@ -16,33 +16,32 @@ export const loginService = (
 
   const { name, password } = data;
 
-  let isUserExists: boolean = false;
-  let userIndex: string | null = null;
+  const userId = loginMap.get(name);
 
-  for (const user of usersMap.values()) {
-    if (user.name === name) {
-      isUserExists = !isUserExists;
-      userIndex = user.index;
-      break;
-    }
-  }
-
-  if (!isUserExists) {
+  if (!userId) {
     const index = randomUUID();
-    usersMap.set(index, { index, name, password });
-    socketsMap.set(ws, index);
+    userMap.set(index, { index, name, password });
+    websocketMap.set(ws, index);
+    loginMap.set(name, index);
+    connectionMap.set(index, ws);
     sendWsMessage(ws, type, { name, index, error: false, errorText: '' });
     return;
   }
 
-  const user = usersMap.get(userIndex ?? '');
+  if (connectionMap.has(userId)) {
+    sendWsRegError(ws, name, 'User already logged in.');
+    return;
+  }
+
+  const user = userMap.get(userId);
 
   if (user?.password !== password) {
     sendWsRegError(ws, name, 'Invalid password. Try again.');
     return;
   }
 
-  socketsMap.set(ws, user.index);
+  websocketMap.set(ws, user.index);
+  connectionMap.set(user.index, ws);
 
   sendWsMessage(ws, type, {
     name: user.name,

@@ -2,6 +2,7 @@ import { MESSAGE_TYPE } from '@const';
 import {
   checkAnswerService,
   createGameService,
+  disconnectWsService,
   joinGameService,
   loginService,
   startGameService,
@@ -34,5 +35,15 @@ export const dispatch = (ws: WebSocket) => {
         checkAnswerService(ws, message);
         break;
     }
+  });
+
+  ws.on('close', () => {
+    console.log('WebSocket closed');
+    disconnectWsService(ws);
+  });
+
+  ws.on('error', (err) => {
+    console.error('WebSocket error:', err);
+    disconnectWsService(ws)
   });
 };
